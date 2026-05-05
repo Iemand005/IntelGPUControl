@@ -21,7 +21,33 @@ public:
         std::vector<ze_driver_handle_t> allDrivers(driverCount);
         zeDriverGet(&driverCount, allDrivers.data());
 
-        
+        ze_driver_handle_t hDriver = nullptr;
+        ze_device_handle_t hDevice = nullptr;
+
+        for (auto& driver : allDrivers) {
+            uint32_t deviceCount = 0;
+            zeDeviceGet(driver, &deviceCount, nullptr);
+            
+            std::vector<ze_device_handle_t> allDevices(deviceCount);
+            zeDeviceGet(driver, &deviceCount, allDevices.data());
+
+            for (auto& device : allDevices) {
+                ze_device_properties_t device_properties = {ZE_STRUCTURE_TYPE_DEVICE_PROPERTIES};
+                zeDeviceGetProperties(device, &device_properties);
+                
+                if (ZE_DEVICE_TYPE_GPU == device_properties.type) {
+                    hDriver = driver;
+                    hDevice = device;
+                    break;
+                }
+            }
+            if (hDevice) break;
+        }
+
+        if (!hDevice) {
+            
+        }
+
         
             // uint driverCount = 0;
             // result = LevelZeroInterop.GetDrivers(ref driverCount, null);
