@@ -10,9 +10,13 @@
 
 // }
 
-class IntelGPUControlApp : public wxApp {
+class IntelFrequencyController {
     ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
+
+};
+
+class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 public:
     virtual bool OnInit() override {
 
@@ -51,33 +55,12 @@ public:
             return false;
         }
 
-        uint32_t pCount;
-        zesDeviceEnumFrequencyDomains(hDevice, &pCount, nullptr);
+        uint32_t freqDomainCount;
+        zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, nullptr);
 
 
         std::vector<zes_freq_handle_t> hFrequency(freqDomainCount);
-        zesDeviceEnumFrequencyDomains(hSysmanDevice, &freqDomainCount, hFrequency.data())
-        
-            // uint driverCount = 0;
-            // result = LevelZeroInterop.GetDrivers(ref driverCount, null);
-            // if (result != 0 || driverCount == 0)
-            //     throw new Exception("No drivers found.");
-
-            // _drivers = new DriverHandle[driverCount];
-            // result = LevelZeroInterop.GetDrivers(ref driverCount, _drivers);
-            // if (result != 0)
-            //     throw new Exception("Failed to get drivers.");
-
-            // uint deviceCount = 0;
-            // result = LevelZeroInterop.GetDevices(_drivers[0], ref deviceCount);
-            // if (result != 0 || deviceCount == 0)
-            //     throw new Exception("No devices found.");
-
-            // _devices = new DeviceHandle[deviceCount];
-            // result = LevelZeroInterop.GetDevices(_drivers[0], ref deviceCount, _devices);
-            // if (result != 0)
-            //     throw new Exception("Failed to get devices.");
-
+        zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, hFrequency.data());
 
             // uint freqDomainCount = 0;
             // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount);
