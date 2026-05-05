@@ -45,7 +45,7 @@ public:
         }
 
         if (!hDevice) {
-            
+            wxMessageBox("Couldn't find Intel GPU.", "Info", wxCLOSE | wxICON_ERROR);
         }
 
         
