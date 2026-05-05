@@ -14,12 +14,8 @@ class IntelFrequencyController {
     ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
 
-};
-
-class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 public:
-    virtual bool OnInit() override {
-
+    bool Init() {
         zeInit(ZE_INIT_FLAG_GPU_ONLY);
 
         uint32_t driverCount = 0;
@@ -27,8 +23,6 @@ public:
 
         std::vector<ze_driver_handle_t> allDrivers(driverCount);
         zeDriverGet(&driverCount, allDrivers.data());
-
-        
 
         for (auto& driver : allDrivers) {
             uint32_t deviceCount = 0;
@@ -50,17 +44,32 @@ public:
             if (hDevice) break;
         }
 
-        if (!hDevice) {
+        if (hDevice)
+            return true;
+        
+        return false;
+    }
+
+    ze_device_handle_t GetDevice() {
+        return hDevice;
+    };
+};
+
+class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
+public:
+    virtual bool OnInit() override {
+
+        if (!Init) {
             wxMessageBox("Couldn't find Intel GPU.", "Info", wxCLOSE | wxICON_ERROR);
             return false;
         }
 
         uint32_t freqDomainCount;
-        zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, nullptr);
+        zesDeviceEnumFrequencyDomains(GetDevice(), &freqDomainCount, nullptr);
 
 
         std::vector<zes_freq_handle_t> hFrequency(freqDomainCount);
-        zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, hFrequency.data());
+        zesDeviceEnumFrequencyDomains(GetDevice(), &freqDomainCount, hFrequency.data());
 
             // uint freqDomainCount = 0;
             // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount);
