@@ -12,6 +12,47 @@
 class IntelGPUControlApp : public wxApp {
 public:
     virtual bool OnInit() override {
+
+        zeInit(ZE_INIT_FLAG_GPU_ONLY);
+
+        uint32_t driverCount = 0;
+        zeDriverGet(&driverCount, nullptr);
+
+        std::vector<ze_driver_handle_t> allDrivers(driverCount);
+        zeDriverGet(&driverCount, allDrivers.data());
+
+        
+        
+            // uint driverCount = 0;
+            // result = LevelZeroInterop.GetDrivers(ref driverCount, null);
+            // if (result != 0 || driverCount == 0)
+            //     throw new Exception("No drivers found.");
+
+            // _drivers = new DriverHandle[driverCount];
+            // result = LevelZeroInterop.GetDrivers(ref driverCount, _drivers);
+            // if (result != 0)
+            //     throw new Exception("Failed to get drivers.");
+
+            // uint deviceCount = 0;
+            // result = LevelZeroInterop.GetDevices(_drivers[0], ref deviceCount);
+            // if (result != 0 || deviceCount == 0)
+            //     throw new Exception("No devices found.");
+
+            // _devices = new DeviceHandle[deviceCount];
+            // result = LevelZeroInterop.GetDevices(_drivers[0], ref deviceCount, _devices);
+            // if (result != 0)
+            //     throw new Exception("Failed to get devices.");
+
+
+            // uint freqDomainCount = 0;
+            // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount);
+            // if (result != 0 || freqDomainCount == 0)
+            //     throw new Exception("No frequency domains found.");
+            // _freqHandles = new FrequencyHandle[freqDomainCount];
+            // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount, _freqHandles);
+            // if (result != 0)
+            //     throw new Exception("Failed to enumerate frequency domains.");
+
         wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Hello World", wxDefaultPosition, wxSize(450, 340));
         
         wxPanel *panel = new wxPanel(frame, wxID_ANY);
