@@ -2,5 +2,7 @@
 #include <ze_api.h>
 
 int main() {
-  zeInit(0);
+  zeInit(ZE_INIT_FLAG_GPU_ONLY);
+
+  
 }
