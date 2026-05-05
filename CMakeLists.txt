@@ -127,7 +127,17 @@ if(MSVC)
     endforeach()
 endif()
 
+
+
+
+
 add_executable(IntelGPUControl main.cpp)
+
+if(MSVC)
+    set_target_properties(IntelGPUControl PROPERTIES 
+        LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
+    )
+endif()
 
 target_include_directories(IntelGPUControl PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/external/level-zero/include
