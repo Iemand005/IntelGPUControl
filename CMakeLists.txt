@@ -1,4 +1,13 @@
-project(IntelGPUControl)
 cmake_minimum_required(VERSION 3.10.0)
+project(IntelGPUControl)
+
+set(ZE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ZE_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ZE_ENABLE_VALIDATION_LAYER OFF CACHE BOOL "" FORCE)
+
 
 add_subdirectory(external/level-zero)
+
+add_executable(IntelGPUControl main.cpp)
+
+target_link_libraries(IntelGPUControl PRIVATE ze_loader)
