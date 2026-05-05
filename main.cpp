@@ -1,5 +1,6 @@
 
 #include <ze_api.h>
+#include <zes_api.h>
 
 #include <wx/wx.h>
 
@@ -10,6 +11,8 @@
 // }
 
 class IntelGPUControlApp : public wxApp {
+    ze_driver_handle_t hDriver = nullptr;
+    ze_device_handle_t hDevice = nullptr;
 public:
     virtual bool OnInit() override {
 
@@ -21,8 +24,7 @@ public:
         std::vector<ze_driver_handle_t> allDrivers(driverCount);
         zeDriverGet(&driverCount, allDrivers.data());
 
-        ze_driver_handle_t hDriver = nullptr;
-        ze_device_handle_t hDevice = nullptr;
+        
 
         for (auto& driver : allDrivers) {
             uint32_t deviceCount = 0;
@@ -46,8 +48,15 @@ public:
 
         if (!hDevice) {
             wxMessageBox("Couldn't find Intel GPU.", "Info", wxCLOSE | wxICON_ERROR);
+            return false;
         }
 
+        uint32_t pCount;
+        zesDeviceEnumFrequencyDomains(hDevice, &pCount, nullptr);
+
+
+        std::vector<zes_freq_handle_t> hFrequency(freqDomainCount);
+        zesDeviceEnumFrequencyDomains(hSysmanDevice, &freqDomainCount, hFrequency.data())
         
             // uint driverCount = 0;
             // result = LevelZeroInterop.GetDrivers(ref driverCount, null);
