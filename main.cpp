@@ -86,12 +86,8 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 
     double GetValue(wxSlider* s) { return static_cast<double>(s->GetValue()); };
 
-    wxSlider *CreateSlider(double value) {
+    wxSlider *CreateSlider(double value, double min, double max) {
         return new wxSlider(panel, wxID_ANY, value, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
-    }
-
-    void Add(wxWindow *window, int flags) {
-        sizer->Add(window, 0, flags | wxALL, 10);
     }
 
 public:
@@ -106,14 +102,14 @@ public:
             panel = new wxPanel(frame, wxID_ANY);
             sizer = new wxBoxSizer(wxVERTICAL);
 
-            minSlider = CreateSlider(range.min);
-            Add(minSlider, wxEXPAND);
+            minSlider = CreateSlider(range.min, range.min, range.max);
+            sizer->Add(minSlider, 0, wxALL | wxEXPAND, 10);
 
-            maxSlider = CreateSlider(range.max);
-            Add(maxSlider, wxEXPAND);
+            maxSlider = CreateSlider(range.max, range.min, range.max);
+            sizer->Add(maxSlider, 0, wxALL | wxEXPAND, 10);
 
             wxButton *button = new wxButton(panel, wxID_ANY, "Set");
-            Add(button, wxCENTER);
+            sizer->Add(button, 0, wxALL | wxCENTER, 10);
 
             panel->SetSizer(sizer);
 
