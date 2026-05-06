@@ -1,13 +1,12 @@
 
+#include <stdexcept>
+
 #include <ze_api.h>
 #include <zes_api.h>
 
 #include <wx/wx.h>
 
-#include <stdexcept>
-
 class IntelFrequencyController {
-    ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
     std::vector<zes_freq_handle_t> phFrequency;
 
@@ -43,19 +42,20 @@ public:
             std::vector<ze_device_handle_t> allDevices(deviceCount);
             zeDeviceGet(driver, &deviceCount, allDevices.data());
 
+            ze_device_properties_t device_properties = {ZE_STRUCTURE_TYPE_DEVICE_PROPERTIES};
             for (auto& device : allDevices) {
-                ze_device_properties_t device_properties = {ZE_STRUCTURE_TYPE_DEVICE_PROPERTIES};
                 zeDeviceGetProperties(device, &device_properties);
                 
-                if (ZE_DEVICE_TYPE_GPU == device_properties.type) {
-                    hDriver = driver;
-                    hDevice = device;
-                    break;
-                }
+                if (device_properties.type != ZE_DEVICE_TYPE_GPU)
+                    continue;
+                
+                hDevice = device;
             }
-            if (hDevice) break;
-        }
 
+            if (!hDevice && allDevices.size() > 0)
+                hDevice = allDevices[0];
+        }
+        
         if (!hDevice)
             throw std::runtime_error("Couldn't find Intel GPU.");
         
@@ -111,7 +111,7 @@ public:
 
         button->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
             wxMessageBox(wxString::Format("%d", minSlider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
-            // slider->GetMax()
+
             double min = ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
             double max = ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
 

@@ -98,10 +98,12 @@ set(wxBUILD_DEMOS    OFF CACHE BOOL "" FORCE)
 set(wxBUILD_TESTS    OFF CACHE BOOL "" FORCE)
 set(wxBUILD_INSTALL  OFF CACHE BOOL "" FORCE)
 
+set(wxBUILD_SHARED OFF CACHE BOOL "" FORCE)
+
 set(CMAKE_VS_SPECTRE_MITIGATION "OFF")
 
 if(MSVC)
-    add_compile_options(/MP)
+    add_compile_options(/MP6)
 endif()
 
 
@@ -132,12 +134,6 @@ endif()
 
 
 add_executable(IntelGPUControl WIN32 main.cpp)
-
-# if(MSVC)
-#     set_target_properties(IntelGPUControl PROPERTIES 
-#         LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
-#     )
-# endif()
 
 target_include_directories(IntelGPUControl PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/external/level-zero/include
