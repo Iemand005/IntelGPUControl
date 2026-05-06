@@ -4,26 +4,26 @@
 
 #include <wx/wx.h>
 
-#include <exception>
+#include <stdexcept>
 
 class IntelFrequencyController {
     ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
-    std::vector<zes_freq_handle_t> phFrequency = nullptr;
+    std::vector<zes_freq_handle_t> phFrequency;
 
     void LoadFrequencyRanges() {
         uint32_t freqDomainCount = 0;
-        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, nullptr);
+        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, nullptr);
 
         if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0)
-            throw std::runtime_exception("No frequency domains found.");
+            throw std::runtime_error("No frequency domains found.");
 
         phFrequency = std::vector<zes_freq_handle_t>(freqDomainCount);
 
-        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, phFrequency.data());
+        result = zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, phFrequency.data());
 
         if (result != ZE_RESULT_SUCCESS)
-            throw std::runtime_exception("Failed to enumerate frequency domains.");
+            throw std::runtime_error("Failed to enumerate frequency domains.");
     }
 
 public:
@@ -68,11 +68,18 @@ public:
 
     zes_freq_range_t GetFrequencyRange() {
         zes_freq_range_t limits;
-        for (auto hFrequency : phFrequency) {
+        for (auto hFrequency : phFrequency)
             if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
                 return limits;
-        }
-        throw std::runtime_error
+        throw std::runtime_error("Failed to get frequency limits.");
+    }
+
+    void SetFrequencyRange(double min, double max) {
+        zes_freq_range_t limits = { min, max };
+        for (auto hFrequency : phFrequency)
+            if (zesFrequencySetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
+                return;
+        throw std::runtime_error("Failed to set frequency limits.");
     }
     
 
