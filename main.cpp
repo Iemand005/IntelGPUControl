@@ -85,6 +85,12 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 
     double GetValue(wxSlider* s) { return static_cast<double>(s->GetValue()); };
 
+    void SetFrequencyLimits() {
+        try {
+            SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
+        } catch (std::runtime_error error) { ShowError(error); }
+    }
+
 public:
     virtual bool OnInit() override {
         try {
@@ -108,13 +114,9 @@ public:
 
             panel->SetSizer(sizer);
 
-            button->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
-                wxMessageBox(wxString::Format("%d", minSlider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
+            auto apply = [this](wxCommandEvent&) { SetFrequencyLimits(); };
 
-                try {
-                    SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
-                } catch (std::runtime_error error) { ShowError(error); }
-            });
+            button->Bind(wxEVT_BUTTON, apply);
 
             // maxSlider->Bind(wxEVT_CHANGGE7)
 
