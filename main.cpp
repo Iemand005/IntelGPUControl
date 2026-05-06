@@ -79,13 +79,6 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
         wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
 
-    zes_freq_range_t GetSliderRange() {
-        return {
-            ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
-            ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
-        };
-    }
-
 public:
     virtual bool OnInit() override {
         int minValue = -1;
@@ -122,8 +115,13 @@ public:
             double min = ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
             double max = ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
 
+            auto getVal = [](wxSlider* s) { return static_cast<double>(s->GetValue()) / s->GetMax(); };
+
             try {
-                SetFrequencyRange(min, max);
+                SetFrequencyRange({
+                    ((double)minSlider->GetValue()) / (double)minSlider->GetMax(),
+                    ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax()
+                });
             } catch (std::runtime_error error) { ShowError(error); }
         });
 
