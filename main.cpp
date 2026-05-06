@@ -65,8 +65,7 @@ public:
         throw std::runtime_error("Failed to get frequency limits.");
     }
 
-    void SetFrequencyRange(double min, double max) {
-        zes_freq_range_t limits = { min, max };
+    void SetFrequencyRange(zes_freq_range_t limits) {
         for (auto hFrequency : phFrequency)
             if (zesFrequencySetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
                 return;
@@ -80,7 +79,12 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
         wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
 
-    
+    zes_freq_range_t GetSliderRange() {
+        return {
+            ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
+            ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
+        };
+    }
 
 public:
     virtual bool OnInit() override {
