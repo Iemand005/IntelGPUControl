@@ -11,17 +11,12 @@ class IntelFrequencyController {
     std::vector<zes_freq_handle_t> phFrequency;
 
     void LoadFrequencyRanges() {
-        uint32_t freqDomainCount = 0;
-        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, nullptr);
-
-        if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0)
+        uint32_t count = 0;
+        if (zesDeviceEnumFrequencyDomains(hDevice, &count, nullptr) != ZE_RESULT_SUCCESS || count == 0)
             throw std::runtime_error("No frequency domains found.");
 
-        phFrequency = std::vector<zes_freq_handle_t>(freqDomainCount);
-
-        result = zesDeviceEnumFrequencyDomains(hDevice, &freqDomainCount, phFrequency.data());
-
-        if (result != ZE_RESULT_SUCCESS)
+        phFrequency.resize(count);
+        if (zesDeviceEnumFrequencyDomains(hDevice, &count, phFrequency.data()) != ZE_RESULT_SUCCESS)
             throw std::runtime_error("Failed to enumerate frequency domains.");
     }
 
