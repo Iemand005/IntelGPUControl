@@ -10,9 +10,29 @@
 
 // }
 
+struct FrequencyRange {
+
+}
+
 class IntelFrequencyController {
     ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
+    std::vector<zes_freq_handle_t> phFrequencyRanges = nullptr;
+
+    void LoadFrequencyRanges() {
+        uint32_t freqDomainCount = 0;
+        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, nullptr);
+
+        if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0)
+            throw std::runtime_exception("No frequency domains found.");
+
+        phFrequencyRanges = std::vector<zes_freq_handle_t>(freqDomainCount);
+
+        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, phFrequencyRanges.data());
+
+        if (result != ZE_RESULT_SUCCESS)
+            throw std::runtime_exception("Failed to enumerate frequency domains.");
+    }
 
 public:
     bool Init() {
@@ -54,22 +74,10 @@ public:
         return hDevice;
     };
 
-    void LoadFrequencyRanges() {
-        uint32_t freqDomainCount = 0;
-        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, nullptr);
-
-        if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0) {
-            throw std::runtime_exception("No frequency domains found.");
-        }
-
-        std::vector<zes_freq_handle_t> freqHandles(freqDomainCount);
-
-        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, freqHandles.data());
-
-        if (result != ZE_RESULT_SUCCESS) {
-            throw std::runtime_exception("Failed to enumerate frequency domains.");
-        }
+    void GetFrequencyRange() {
+        zesFrequencyGetRange()
     }
+    
 
     // void GetFrequencyRange(&double min, &double max)
     // {
