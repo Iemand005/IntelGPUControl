@@ -4,20 +4,12 @@
 
 #include <wx/wx.h>
 
-// int main() {
-//   zeInit(ZE_INIT_FLAG_GPU_ONLY);
-
-
-// }
-
-struct FrequencyRange {
-
-}
+#include <exception>
 
 class IntelFrequencyController {
     ze_driver_handle_t hDriver = nullptr;
     ze_device_handle_t hDevice = nullptr;
-    std::vector<zes_freq_handle_t> phFrequencyRanges = nullptr;
+    std::vector<zes_freq_handle_t> phFrequency = nullptr;
 
     void LoadFrequencyRanges() {
         uint32_t freqDomainCount = 0;
@@ -26,9 +18,9 @@ class IntelFrequencyController {
         if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0)
             throw std::runtime_exception("No frequency domains found.");
 
-        phFrequencyRanges = std::vector<zes_freq_handle_t>(freqDomainCount);
+        phFrequency = std::vector<zes_freq_handle_t>(freqDomainCount);
 
-        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, phFrequencyRanges.data());
+        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, phFrequency.data());
 
         if (result != ZE_RESULT_SUCCESS)
             throw std::runtime_exception("Failed to enumerate frequency domains.");
@@ -74,8 +66,13 @@ public:
         return hDevice;
     };
 
-    void GetFrequencyRange() {
-        zesFrequencyGetRange()
+    zes_freq_range_t GetFrequencyRange() {
+        zes_freq_range_t limits;
+        for (auto hFrequency : phFrequency) {
+            if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
+                return limits;
+        }
+        throw std::runtime_error
     }
     
 
