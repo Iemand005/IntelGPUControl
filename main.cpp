@@ -75,6 +75,9 @@ public:
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 
+    wxSlider *minSlider;
+    wxSlider *maxSlider;
+
     void ShowError(std::runtime_error error) {
         wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
@@ -92,7 +95,7 @@ public:
             auto range = GetFrequencyRange();
             minValue = range.min;
 
-        } catch (std::runtime_error error) { ShowError(error); }
+       
 
         wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Intel GPU Control", wxDefaultPosition, wxSize(450, 340));
         
@@ -100,10 +103,10 @@ public:
 
         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-        wxSlider *minSlider = new wxSlider(panel, wxID_ANY, 0, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+        minSlider = new wxSlider(panel, wxID_ANY, 0, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
         sizer->Add(minSlider, 0, wxALL | wxEXPAND, 10);
 
-        wxSlider *maxSlider = new wxSlider(panel, wxID_ANY, 100, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+        maxSlider = new wxSlider(panel, wxID_ANY, 100, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
         sizer->Add(maxSlider, 0, wxALL | wxEXPAND, 10);
 
         wxButton *button = new wxButton(panel, wxID_ANY, "Set");
@@ -111,7 +114,7 @@ public:
 
         panel->SetSizer(sizer);
 
-        button->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+        button->Bind(wxEVT_BUTTON, [this, minSlider, maxSlider](wxCommandEvent&) {
             wxMessageBox(wxString::Format("%d", minSlider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
 
             try {
@@ -124,6 +127,11 @@ public:
         frame->Show(true);
         
         return true;
+        } catch (std::runtime_error error) {
+            ShowError(error);
+            return false;
+        }
+        return false;
     }
 };
 
