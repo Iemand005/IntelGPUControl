@@ -74,22 +74,9 @@ public:
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 
-    wxPanel *panel;
-    wxBoxSizer *sizer;
-    wxSlider *minSlider;
-    wxSlider *maxSlider;
-
-    void ShowError(std::runtime_error error) {
-        wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
-    }
+    void ShowError(std::runtime_error error) { wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR); }
 
     double GetValue(wxSlider* s) { return static_cast<double>(s->GetValue()); };
-
-    void SetFrequencyLimits() {
-        try {
-            SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
-        } catch (std::runtime_error error) { ShowError(error); }
-    }
 
 public:
     virtual bool OnInit() override {
@@ -100,25 +87,29 @@ public:
 
             wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Intel GPU Control", wxDefaultPosition, wxSize(450, 340));
             
-            panel = new wxPanel(frame, wxID_ANY);
-            sizer = new wxBoxSizer(wxVERTICAL);
+            wxPanel *panel = new wxPanel(frame, wxID_ANY);
+            wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-            minSlider = new wxSlider(panel, wxID_ANY, range.min, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+            wxSlider *minSlider = new wxSlider(panel, wxID_ANY, range.min, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+            wxSlider *maxSlider = new wxSlider(panel, wxID_ANY, range.max, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+            
             sizer->Add(minSlider, 0, wxALL | wxEXPAND, 10);
-
-            maxSlider = new wxSlider(panel, wxID_ANY, range.max, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
             sizer->Add(maxSlider, 0, wxALL | wxEXPAND, 10);
-
-            wxButton *button = new wxButton(panel, wxID_ANY, "Set");
-            sizer->Add(button, 0, wxALL | wxCENTER, 10);
 
             panel->SetSizer(sizer);
 
-            auto apply = [this](wxCommandEvent&) { SetFrequencyLimits(); };
+            auto apply = [=](wxCommandEvent&) { 
+                try {
+                    SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
+                } catch (std::runtime_error error) {
+                    ShowError(error);
+                    minSlider->SetValue(range.min);
+                    maxSlider->SetValue(range.max);
+                }
+            };
 
-            button->Bind(wxEVT_BUTTON, apply);
-
-            // maxSlider->Bind(wxEVT_CHANGGE7)
+            minSlider->Bind(wxEVT_SLIDER, apply);
+            maxSlider->Bind(wxEVT_SLIDER, apply);
 
             frame->Show(true);
             
