@@ -27,7 +27,7 @@ class IntelFrequencyController {
     }
 
 public:
-    bool Init() {
+    void Init() {
         zeInit(ZE_INIT_FLAG_GPU_ONLY);
 
         uint32_t driverCount = 0;
@@ -58,10 +58,8 @@ public:
 
         if (!hDevice)
             throw std::runtime_error("Couldn't find Intel GPU.");
-
-            return true;
         
-        return false;
+        LoadFrequencyRanges();
     }
 
     zes_freq_range_t GetFrequencyRange() {
@@ -84,7 +82,7 @@ public:
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
 
     void ShowError(std::runtime_error error) {
-
+        wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
 
 public:
@@ -92,10 +90,7 @@ public:
 
         try {
             Init();
-            return false;
-        } catch (std::runtime_error error) {
-            wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
-        }
+        } catch (std::runtime_error error) { ShowError(error); }
 
         wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Hello World", wxDefaultPosition, wxSize(450, 340));
         
@@ -103,22 +98,26 @@ public:
 
         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-        wxSlider *slider = new wxSlider(panel, wxID_ANY, 50, 0, 100, 
-                                        wxDefaultPosition, wxDefaultSize, 
-                                        wxSL_HORIZONTAL | wxSL_LABELS);
-        sizer->Add(slider, 0, wxALL | wxEXPAND, 10);
+        wxSlider *minSlider = new wxSlider(panel, wxID_ANY, 0, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+        sizer->Add(minSlider, 0, wxALL | wxEXPAND, 10);
+
+        wxSlider *maxSlider = new wxSlider(panel, wxID_ANY, 100, 0, 100,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+        sizer->Add(maxSlider, 0, wxALL | wxEXPAND, 10);
 
         wxButton *button = new wxButton(panel, wxID_ANY, "Set");
         sizer->Add(button, 0, wxALL | wxCENTER, 10);
 
         panel->SetSizer(sizer);
 
-        button->Bind(wxEVT_BUTTON, [slider](wxCommandEvent&) {
-            wxMessageBox(wxString::Format("%d", slider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
+        button->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+            wxMessageBox(wxString::Format("%d", minSlider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
             // slider->GetMax()
-            double value = ((double)slider->GetValue()) / (double)slider->GetMax();
+            double min = ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
+            double max = ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
 
-            SetFrequencyRange(value, value);
+            try {
+                SetFrequencyRange(min, max);
+            } catch (std::runtime_error error) { ShowError(error); }
         });
 
         frame->Show(true);
