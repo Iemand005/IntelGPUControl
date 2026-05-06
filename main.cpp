@@ -54,31 +54,48 @@ public:
         return hDevice;
     };
 
-    void GetFrequencyRange(&double min, &double max)
-    {
-        forf (var handle in _freqHandles)
-        {
-            FrequencyRange range = new FrequencyRange();
-            int result = LevelZeroInterop.GetFrequencyRange(handle, ref range);
-            if (result != 0)
-                throw new Exception("Failed to get frequency range.");
-            min = range.Min;
-            max = range.Max;
-            return;
+    void LoadFrequencyRanges() {
+        uint32_t freqDomainCount = 0;
+        ze_result_t result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, nullptr);
+
+        if (result != ZE_RESULT_SUCCESS || freqDomainCount == 0) {
+            throw std::runtime_exception("No frequency domains found.");
         }
-        throw new Exception("Frequency domain not found.");
+
+        std::vector<zes_freq_handle_t> freqHandles(freqDomainCount);
+
+        result = zesDeviceEnumFrequencyDomains(hDevices[0], &freqDomainCount, freqHandles.data());
+
+        if (result != ZE_RESULT_SUCCESS) {
+            throw std::runtime_exception("Failed to enumerate frequency domains.");
+        }
     }
 
-    void SetFrequencyRange(double min, double max)
-    {
-        foreach (var handle in _freqHandles)
-        {
-            FrequencyRange range = new FrequencyRange { Min = min, Max = max };
-            int result = LevelZeroInterop.SetFrequencyRange(handle, ref range);
-            if (result != 0)
-                throw new Exception("Failed to set frequency range.");
-        }
-    }
+    // void GetFrequencyRange(&double min, &double max)
+    // {
+    //     forf (var handle in _freqHandles)
+    //     {
+    //         FrequencyRange range = new FrequencyRange();
+    //         int result = LevelZeroInterop.GetFrequencyRange(handle, ref range);
+    //         if (result != 0)
+    //             throw new Exception("Failed to get frequency range.");
+    //         min = range.Min;
+    //         max = range.Max;
+    //         return;
+    //     }
+    //     throw new Exception("Frequency domain not found.");
+    // }
+
+    // void SetFrequencyRange(double min, double max)
+    // {
+    //     foreach (var handle in _freqHandles)
+    //     {
+    //         FrequencyRange range = new FrequencyRange { Min = min, Max = max };
+    //         int result = LevelZeroInterop.SetFrequencyRange(handle, ref range);
+    //         if (result != 0)
+    //             throw new Exception("Failed to set frequency range.");
+    //     }
+    // }
 };
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
