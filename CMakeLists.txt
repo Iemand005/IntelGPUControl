@@ -87,11 +87,11 @@ set(wxUSE_TREEBOOK    OFF CACHE BOOL "" FORCE)
 set(wxUSE_DOC_VIEW_FRAMEWORK OFF CACHE BOOL "" FORCE)
 set(wxUSE_PRINTING_ARCHITECTURE OFF CACHE BOOL "" FORCE)
 
-set(wxUSE_ZLIB builtin CACHE BOOL "" FORCE)
-set(wxUSE_IMAGE ON CACHE BOOL "" FORCE)
-set(wxUSE_LIBPNG builtin CACHE BOOL "" FORCE)
-set(wxUSE_TOOLBAR ON CACHE BOOL "" FORCE)
-set(wxUSE_TOOLBAR_NATIVE ON CACHE BOOL "" FORCE)
+set(wxUSE_ZLIB OFF CACHE BOOL "" FORCE)
+set(wxUSE_IMAGE OFF CACHE BOOL "" FORCE)
+set(wxUSE_LIBPNG OFF CACHE BOOL "" FORCE)
+set(wxUSE_TOOLBAR OFF CACHE BOOL "" FORCE)
+set(wxUSE_TOOLBAR_NATIVE OFF CACHE BOOL "" FORCE)
 
 set(wxBUILD_SAMPLES  OFF CACHE BOOL "" FORCE)
 set(wxBUILD_DEMOS    OFF CACHE BOOL "" FORCE)
@@ -129,6 +129,16 @@ if(MSVC)
     endforeach()
 endif()
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+if(MSVC)
+    add_compile_options(/Zi)
+    add_link_options(/DEBUG)
+else()
+    add_compile_options(-g)
+endif()
 
 
 
