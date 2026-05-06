@@ -68,7 +68,7 @@ public:
 
     void SetFrequencyRange(zes_freq_range_t limits) {
         if (zesFrequencySetRange(hFrequency, &limits) != ZE_RESULT_SUCCESS)
-            throw std::runtime_error("Failed to set frequency limits.");
+            throw std::runtime_error("Failed to set frequency limits. Setting requires admin rights!");
     }
 };
 
