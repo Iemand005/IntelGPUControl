@@ -8,16 +8,18 @@
 
 class IntelFrequencyController {
     ze_device_handle_t hDevice = nullptr;
-    std::vector<zes_freq_handle_t> phFrequency;
+    zes_freq_handle_t hFrequency;
 
     void LoadFrequencyRanges() {
         uint32_t count = 0;
-        if (zesDeviceEnumFrequencyDomains(hDevice, &count, nullptr) != ZE_RESULT_SUCCESS || count == 0)
+        if (zesDeviceEnumFrequencyDomains(hDevice, &count, nullptr) != ZE_RESULT_SUCCESS || count <= 0)
             throw std::runtime_error("No frequency domains found.");
 
-        phFrequency.resize(count);
+        std::vector<zes_freq_handle_t> phFrequency(count);
         if (zesDeviceEnumFrequencyDomains(hDevice, &count, phFrequency.data()) != ZE_RESULT_SUCCESS)
             throw std::runtime_error("Failed to enumerate frequency domains.");
+        
+        hFrequency = phFrequency.front();
     }
 
 public:
@@ -59,16 +61,14 @@ public:
 
     zes_freq_range_t GetFrequencyRange() {
         zes_freq_range_t limits;
-        for (auto hFrequency : phFrequency)
-            if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
-                return limits;
+        if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
+            return limits;
         throw std::runtime_error("Failed to get frequency limits.");
     }
 
     void SetFrequencyRange(zes_freq_range_t limits) {
-        for (auto hFrequency : phFrequency)
-            if (zesFrequencySetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
-                return;
+        if (zesFrequencySetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
+            return;
         throw std::runtime_error("Failed to set frequency limits.");
     }
 };
