@@ -79,6 +79,8 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
         wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
 
+    double GetValue(wxSlider* s) { return static_cast<double>(s->GetValue()); };
+
 public:
     virtual bool OnInit() override {
         int minValue = -1;
@@ -92,7 +94,7 @@ public:
 
         } catch (std::runtime_error error) { ShowError(error); }
 
-        wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Hello World", wxDefaultPosition, wxSize(450, 340));
+        wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Intel GPU Control", wxDefaultPosition, wxSize(450, 340));
         
         wxPanel *panel = new wxPanel(frame, wxID_ANY);
 
@@ -112,18 +114,12 @@ public:
         button->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
             wxMessageBox(wxString::Format("%d", minSlider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
 
-            double min = ((double)minSlider->GetValue()) / (double)minSlider->GetMax();
-            double max = ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax();
-
-            auto getVal = [](wxSlider* s) { return static_cast<double>(s->GetValue()) / s->GetMax(); };
-
             try {
-                SetFrequencyRange({
-                    ((double)minSlider->GetValue()) / (double)minSlider->GetMax(),
-                    ((double)maxSlider->GetValue()) / (double)maxSlider->GetMax()
-                });
+                SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
             } catch (std::runtime_error error) { ShowError(error); }
         });
+
+        // maxSlider->Bind(wxEVT_CHANGGE7)
 
         frame->Show(true);
         
