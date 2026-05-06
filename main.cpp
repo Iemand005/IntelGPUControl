@@ -53,6 +53,32 @@ public:
     ze_device_handle_t GetDevice() {
         return hDevice;
     };
+
+    void GetFrequencyRange(&double min, &double max)
+    {
+        forf (var handle in _freqHandles)
+        {
+            FrequencyRange range = new FrequencyRange();
+            int result = LevelZeroInterop.GetFrequencyRange(handle, ref range);
+            if (result != 0)
+                throw new Exception("Failed to get frequency range.");
+            min = range.Min;
+            max = range.Max;
+            return;
+        }
+        throw new Exception("Frequency domain not found.");
+    }
+
+    void SetFrequencyRange(double min, double max)
+    {
+        foreach (var handle in _freqHandles)
+        {
+            FrequencyRange range = new FrequencyRange { Min = min, Max = max };
+            int result = LevelZeroInterop.SetFrequencyRange(handle, ref range);
+            if (result != 0)
+                throw new Exception("Failed to set frequency range.");
+        }
+    }
 };
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
