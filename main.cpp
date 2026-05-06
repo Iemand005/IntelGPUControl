@@ -80,11 +80,19 @@ class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
         wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
     }
 
+    
+
 public:
     virtual bool OnInit() override {
+        int minValue = -1;
+        int maxValue = -1;
 
         try {
             Init();
+
+            auto range = GetFrequencyRange();
+            minValue = range.min;
+
         } catch (std::runtime_error error) { ShowError(error); }
 
         wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Hello World", wxDefaultPosition, wxSize(450, 340));
