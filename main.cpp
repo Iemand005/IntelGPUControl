@@ -56,15 +56,13 @@ public:
             if (hDevice) break;
         }
 
-        if (hDevice)
+        if (!hDevice)
+            throw std::runtime_error("Couldn't find Intel GPU.");
+
             return true;
         
         return false;
     }
-
-    ze_device_handle_t GetDevice() {
-        return hDevice;
-    };
 
     zes_freq_range_t GetFrequencyRange() {
         zes_freq_range_t limits;
@@ -81,65 +79,29 @@ public:
                 return;
         throw std::runtime_error("Failed to set frequency limits.");
     }
-    
-
-    // void GetFrequencyRange(&double min, &double max)
-    // {
-    //     forf (var handle in _freqHandles)
-    //     {
-    //         FrequencyRange range = new FrequencyRange();
-    //         int result = LevelZeroInterop.GetFrequencyRange(handle, ref range);
-    //         if (result != 0)
-    //             throw new Exception("Failed to get frequency range.");
-    //         min = range.Min;
-    //         max = range.Max;
-    //         return;
-    //     }
-    //     throw new Exception("Frequency domain not found.");
-    // }
-
-    // void SetFrequencyRange(double min, double max)
-    // {
-    //     foreach (var handle in _freqHandles)
-    //     {
-    //         FrequencyRange range = new FrequencyRange { Min = min, Max = max };
-    //         int result = LevelZeroInterop.SetFrequencyRange(handle, ref range);
-    //         if (result != 0)
-    //             throw new Exception("Failed to set frequency range.");
-    //     }
-    // }
 };
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
+
+    void ShowError(std::runtime_error error) {
+
+    }
+
 public:
     virtual bool OnInit() override {
 
-        if (!Init) {
-            wxMessageBox("Couldn't find Intel GPU.", "Info", wxCLOSE | wxICON_ERROR);
+        try {
+            Init();
             return false;
+        } catch (std::runtime_error error) {
+            wxMessageBox(error.what(), "Error", wxCLOSE | wxICON_ERROR);
         }
-
-        uint32_t freqDomainCount;
-        zesDeviceEnumFrequencyDomains(GetDevice(), &freqDomainCount, nullptr);
-
-
-        std::vector<zes_freq_handle_t> hFrequency(freqDomainCount);
-        zesDeviceEnumFrequencyDomains(GetDevice(), &freqDomainCount, hFrequency.data());
-
-            // uint freqDomainCount = 0;
-            // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount);
-            // if (result != 0 || freqDomainCount == 0)
-            //     throw new Exception("No frequency domains found.");
-            // _freqHandles = new FrequencyHandle[freqDomainCount];
-            // result = LevelZeroInterop.GetDeviceFrequencies(_devices[0], ref freqDomainCount, _freqHandles);
-            // if (result != 0)
-            //     throw new Exception("Failed to enumerate frequency domains.");
 
         wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Hello World", wxDefaultPosition, wxSize(450, 340));
         
         wxPanel *panel = new wxPanel(frame, wxID_ANY);
 
-         wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+        wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
         wxSlider *slider = new wxSlider(panel, wxID_ANY, 50, 0, 100, 
                                         wxDefaultPosition, wxDefaultSize, 
@@ -152,8 +114,11 @@ public:
         panel->SetSizer(sizer);
 
         button->Bind(wxEVT_BUTTON, [slider](wxCommandEvent&) {
-            wxMessageBox(wxString::Format("%d", slider->GetValue()), 
-                        "Info", wxOK | wxICON_INFORMATION);
+            wxMessageBox(wxString::Format("%d", slider->GetValue()), "Info", wxOK | wxICON_INFORMATION);
+            // slider->GetMax()
+            double value = ((double)slider->GetValue()) / (double)slider->GetMax();
+
+            SetFrequencyRange(value, value);
         });
 
         frame->Show(true);
