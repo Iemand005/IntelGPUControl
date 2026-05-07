@@ -138,7 +138,7 @@ public:
                 maxSlider->SetValue(range.max);
             };
 
-            auto apply = [=]() { 
+            auto apply = [=](wxCommandEvent&) { 
                 try {
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
@@ -157,15 +157,15 @@ public:
             sizer->Add(unlockButton);
             sizer->Add(resetButton);
 
-            unlockButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-                ExtendFrequencyRange();
-                updateSliders();
-            });
+            // unlockButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+            //     ExtendFrequencyRange();
+            //     updateSliders();
+            // });
 
-            resetButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-                ResetFrequencyRange();
-                updateSliders();
-            });
+            // resetButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+            //     ResetFrequencyRange();
+            //     updateSliders();
+            // });
 
             frame->Show(true);
             
