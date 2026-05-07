@@ -1,7 +1,7 @@
 
 #include <stdexcept>
 
-#include <ze_api.h>
+// #include <ze_api.h>
 #include <zes_api.h>
 
 #include <wx/wx.h>
@@ -24,7 +24,9 @@ class IntelFrequencyController {
 
 public:
     void Init() {
-        zeInit(ZE_INIT_FLAG_GPU_ONLY);
+        // zeInit(ZE_INIT_FLAG_GPU_ONLY);
+        zesInit(0);
+        zesDriverGet
 
         uint32_t driverCount = 0;
         zeDriverGet(&driverCount, nullptr);
@@ -133,11 +135,10 @@ public:
             panel->SetSizer(sizer);
 
             auto updateSliders = [&]() {
-                try {
-                    auto range = GetFrequencyRange();
-                    minSlider->SetValue(range.min);
-                    maxSlider->SetValue(range.max);
-                } catch (std::runtime_error error) { ShowError(error); }
+                Init();
+                auto range = GetFrequencyRange();
+                minSlider->SetValue(range.min);
+                maxSlider->SetValue(range.max);
             };
 
             auto apply = [=](wxCommandEvent&) { 
