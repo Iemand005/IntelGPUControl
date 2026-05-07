@@ -44,8 +44,8 @@ public:
             for (auto& device : allDevices) {
                 zesDeviceGetProperties(device, &device_properties);
                 
-                // if (device_properties.stype != ZE_DEVICE_TYPE_GPU)
-                //     continue;
+                if (device_properties.core.type != ZE_DEVICE_TYPE_GPU)
+                    continue;
                 
                 hDevice = device;
             }
