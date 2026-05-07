@@ -135,8 +135,15 @@ public:
                 }
             };
 
-            minSlider->Bind(wxEVT_SLIDER, apply);
-            maxSlider->Bind(wxEVT_SLIDER, apply);
+            minSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
+                if (min > max) {
+                    min = max;
+                    updateSliders();
+                }
+            });
+            maxSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
+                
+            });
 
 
             wxButton *unlockButton = new wxButton(panel, wxID_ANY, "Unlock");
