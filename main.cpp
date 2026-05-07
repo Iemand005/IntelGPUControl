@@ -143,13 +143,19 @@ public:
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
                     ShowError(error);
-                    minSlider->SetValue(range.min);
-                    maxSlider->SetValue(range.max);
+                    updateSliders();
                 }
             };
 
             minSlider->Bind(wxEVT_SLIDER, apply);
             maxSlider->Bind(wxEVT_SLIDER, apply);
+
+
+            wxButton *unlockButton = new wxButton(panel, wxID_ANY, "Unlock");
+            wxButton *resetButton = new wxButton(panel, wxID_ANY, "Unlock");
+
+            sizer->Add(unlockButton);
+            sizer->Add(resetButton);
 
             frame->Show(true);
             
