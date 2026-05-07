@@ -60,7 +60,7 @@ public:
     }
 
     zes_freq_range_t GetSupportedFrequencyRange() {
-        zes_freq_properties_t Properties{};
+        zes_freq_properties_t Properties;
         zesFrequencyGetProperties(hFrequency, &Properties);
         
         // if (!Properties.canControl)
@@ -85,7 +85,7 @@ public:
     //     }
 
     zes_freq_range_t GetFrequencyRange() {
-        zes_freq_range_t limits{};
+        zes_freq_range_t limits;
         if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
             return limits;
         throw std::runtime_error("Failed to get frequency limits.");
