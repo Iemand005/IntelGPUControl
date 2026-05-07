@@ -59,6 +59,31 @@ public:
         LoadFrequencyRanges();
     }
 
+    zes_freq_range_t GetSupportedFrequencyRange() {
+        zes_freq_properties_t Properties;
+        zesFrequencyGetProperties(hFrequency, &Properties);
+        
+        // if (!Properties.canControl)
+        //     throw std::runtime_error("This GPU's frequency cannot be controlled");
+        // Properties.
+        return { Properties.min, Properties.max };
+    }
+
+    // public void GetSupportedFrequencyRange(out double min, out double max)
+    //     {
+    //         foreach (var handle in _freqHandles)
+    //         {
+    //             FrequencyProperties properties = new FrequencyProperties();
+    //             int result = LevelZeroInterop.GetFrequencyProperties(handle, ref properties);
+    //             if (result != 0)
+    //                 throw new Exception("Failed to get frequency properties.");
+    //             min = properties.Min;
+    //             max = properties.Max;
+    //             return;
+    //         }
+    //         throw new Exception("Frequency domain not found.");
+    //     }
+
     zes_freq_range_t GetFrequencyRange() {
         zes_freq_range_t limits;
         if (zesFrequencyGetRange(hFrequency, &limits) == ZE_RESULT_SUCCESS)
@@ -84,14 +109,15 @@ public:
             Init();
 
             auto range = GetFrequencyRange();
+            auto supportedRange = GetSupportedFrequencyRange();
 
             wxFrame *frame = new wxFrame(NULL, wxID_ANY, "Intel GPU Control", wxDefaultPosition, wxSize(450, 340));
             
             wxPanel *panel = new wxPanel(frame, wxID_ANY);
             wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 
-            wxSlider *minSlider = new wxSlider(panel, wxID_ANY, range.min, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
-            wxSlider *maxSlider = new wxSlider(panel, wxID_ANY, range.max, range.min, range.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+            wxSlider *minSlider = new wxSlider(panel, wxID_ANY, range.min, supportedRange.min, supportedRange.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+            wxSlider *maxSlider = new wxSlider(panel, wxID_ANY, range.max, supportedRange.min, supportedRange.max,  wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
             
             sizer->Add(minSlider, 0, wxALL | wxEXPAND, 10);
             sizer->Add(maxSlider, 0, wxALL | wxEXPAND, 10);
