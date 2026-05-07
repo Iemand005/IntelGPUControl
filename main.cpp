@@ -131,12 +131,18 @@ public:
 
             minSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
                 double min = GetValue(minSlider), max = GetValue(maxSlider);
-                if (min > max) min = max;
+                if (min > max) {
+                    min = max;
+                    minSlider->SetValue(max);
+                }
                 apply(min, max);
             });
             maxSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
                 double min = GetValue(minSlider), max = GetValue(maxSlider);
-                if (max < min) max = min;
+                if (max < min) {
+                    max = min;
+                    maxSlider->SetValue(min);
+                }
                 apply(min, max);
             });
 
