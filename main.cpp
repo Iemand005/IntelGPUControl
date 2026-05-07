@@ -95,6 +95,14 @@ public:
         if (zesFrequencySetRange(hFrequency, &limits) != ZE_RESULT_SUCCESS)
             throw std::runtime_error("Failed to set frequency limits. Setting requires admin rights!");
     }
+
+    void ResetFrequencyRange() {
+        SetFrequencyRange({ -1, -1 });
+    }
+
+    void ExtendFrequencyRange() {
+        SetFrequencyRange({ 0, 0 });
+    }
 };
 
 class IntelGPUControlApp : public wxApp, public IntelFrequencyController {
@@ -124,7 +132,13 @@ public:
 
             panel->SetSizer(sizer);
 
-            auto apply = [=](wxCommandEvent&) { 
+            auto updateSliders = [=]() {
+                auto range = GetFrequencyRange();
+                minSlider->SetValue(range.min);
+                maxSlider->SetValue(range.max);
+            };
+
+            auto apply = [=]() { 
                 try {
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
