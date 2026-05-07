@@ -133,10 +133,10 @@ public:
             sizer->Add(unlockButton);
             sizer->Add(resetButton);
 
-            unlockButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+            unlockButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 try {
                     ExtendFrequencyRange();
-                    
+
                     auto range = GetFrequencyRange();
 
                     minSlider->SetValue(range.min);
@@ -144,7 +144,7 @@ public:
                 } catch (std::runtime_error error) { ShowError(error); }
             });
 
-            resetButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+            resetButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 try {
                     ResetFrequencyRange();
                     
