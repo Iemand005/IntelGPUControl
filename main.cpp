@@ -123,7 +123,10 @@ public:
             auto apply = [=](wxCommandEvent&) { 
                 try {
                     double min = GetValue(minSlider), max = GetValue(maxSlider);
-                    if (min > max) min = max;
+                    if (min > max) {
+                        min = max;
+                        updateSliders();
+                    }
                     // if (max >) min = max;
                     SetFrequencyRange({ min, max });
                 } catch (std::runtime_error error) {
