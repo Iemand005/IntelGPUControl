@@ -7,7 +7,7 @@
 #include <wx/wx.h>
 
 class IntelFrequencyController {
-    ze_device_handle_t hDevice = nullptr;
+    zes_device_handle_t hDevice = nullptr;
     zes_freq_handle_t hFrequency;
 
     void LoadFrequencyRanges() {
@@ -26,27 +26,26 @@ public:
     void Init() {
         // zeInit(ZE_INIT_FLAG_GPU_ONLY);
         zesInit(0);
-        zesDriverGet
 
         uint32_t driverCount = 0;
-        zeDriverGet(&driverCount, nullptr);
+        zesDriverGet(&driverCount, nullptr);
 
-        std::vector<ze_driver_handle_t> allDrivers(driverCount);
-        zeDriverGet(&driverCount, allDrivers.data());
+        std::vector<zes_driver_handle_t> allDrivers(driverCount);
+        zesDriverGet(&driverCount, allDrivers.data());
 
         for (auto& driver : allDrivers) {
             uint32_t deviceCount = 0;
-            zeDeviceGet(driver, &deviceCount, nullptr);
+            zesDeviceGet(driver, &deviceCount, nullptr);
             
-            std::vector<ze_device_handle_t> allDevices(deviceCount);
-            zeDeviceGet(driver, &deviceCount, allDevices.data());
+            std::vector<zes_device_handle_t> allDevices(deviceCount);
+            zesDeviceGet(driver, &deviceCount, allDevices.data());
 
-            ze_device_properties_t device_properties = {ZE_STRUCTURE_TYPE_DEVICE_PROPERTIES};
+            zes_device_properties_t device_properties = {ZES_STRUCTURE_TYPE_DEVICE_PROPERTIES};
             for (auto& device : allDevices) {
-                zeDeviceGetProperties(device, &device_properties);
+                zesDeviceGetProperties(device, &device_properties);
                 
-                if (device_properties.type != ZE_DEVICE_TYPE_GPU)
-                    continue;
+                // if (device_properties.stype != ZE_DEVICE_TYPE_GPU)
+                //     continue;
                 
                 hDevice = device;
             }
@@ -64,27 +63,8 @@ public:
     zes_freq_range_t GetSupportedFrequencyRange() {
         zes_freq_properties_t Properties;
         zesFrequencyGetProperties(hFrequency, &Properties);
-        
-        // if (!Properties.canControl)
-        //     throw std::runtime_error("This GPU's frequency cannot be controlled");
-        // Properties.
         return { Properties.min, Properties.max };
     }
-
-    // public void GetSupportedFrequencyRange(out double min, out double max)
-    //     {
-    //         foreach (var handle in _freqHandles)
-    //         {
-    //             FrequencyProperties properties = new FrequencyProperties();
-    //             int result = LevelZeroInterop.GetFrequencyProperties(handle, ref properties);
-    //             if (result != 0)
-    //                 throw new Exception("Failed to get frequency properties.");
-    //             min = properties.Min;
-    //             max = properties.Max;
-    //             return;
-    //         }
-    //         throw new Exception("Frequency domain not found.");
-    //     }
 
     zes_freq_range_t GetFrequencyRange() {
         zes_freq_range_t limits;
