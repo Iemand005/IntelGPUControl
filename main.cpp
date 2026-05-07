@@ -118,6 +118,9 @@ public:
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
                     ShowError(error);
+                    
+                    auto range = GetFrequencyRange();
+
                     minSlider->SetValue(range.min);
                     maxSlider->SetValue(range.max);
                 }
