@@ -24,7 +24,6 @@ class IntelFrequencyController {
 
 public:
     void Init() {
-        // zeInit(ZE_INIT_FLAG_GPU_ONLY);
         zesInit(0);
 
         uint32_t driverCount = 0;
@@ -114,19 +113,13 @@ public:
 
             panel->SetSizer(sizer);
 
-            auto updateSliders = [&]() {
-                Init();
-                auto range = GetFrequencyRange();
-                minSlider->SetValue(range.min);
-                maxSlider->SetValue(range.max);
-            };
-
             auto apply = [=](wxCommandEvent&) { 
                 try {
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
                     ShowError(error);
-                    updateSliders();
+                    minSlider->SetValue(range.min);
+                    maxSlider->SetValue(range.max);
                 }
             };
 
@@ -143,14 +136,22 @@ public:
             unlockButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
                 try {
                     ExtendFrequencyRange();
-                    updateSliders();
+                    
+                    auto range = GetFrequencyRange();
+
+                    minSlider->SetValue(range.min);
+                    maxSlider->SetValue(range.max);
                 } catch (std::runtime_error error) { ShowError(error); }
             });
 
             resetButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
                 try {
                     ResetFrequencyRange();
-                    updateSliders();
+                    
+                    auto range = GetFrequencyRange();
+                    
+                    minSlider->SetValue(range.min);
+                    maxSlider->SetValue(range.max);
                 } catch (std::runtime_error error) { ShowError(error); }
             });
 
