@@ -113,16 +113,20 @@ public:
 
             panel->SetSizer(sizer);
 
+            auto updateSliders = [=]() {
+                auto range = GetFrequencyRange();
+
+                minSlider->SetValue(range.min);
+                maxSlider->SetValue(range.max);
+            };
+
             auto apply = [=](wxCommandEvent&) { 
                 try {
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
                     ShowError(error);
-                    
-                    auto range = GetFrequencyRange();
 
-                    minSlider->SetValue(range.min);
-                    maxSlider->SetValue(range.max);
+                   updateSliders();
                 }
             };
 
@@ -140,10 +144,7 @@ public:
                 try {
                     ExtendFrequencyRange();
 
-                    auto range = GetFrequencyRange();
-
-                    minSlider->SetValue(range.min);
-                    maxSlider->SetValue(range.max);
+                    updateSliders();
                 } catch (std::runtime_error error) { ShowError(error); }
             });
 
