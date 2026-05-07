@@ -157,15 +157,19 @@ public:
             sizer->Add(unlockButton);
             sizer->Add(resetButton);
 
-            // unlockButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
-            //     ExtendFrequencyRange();
-            //     updateSliders();
-            // });
+            unlockButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+                try {
+                    ExtendFrequencyRange();
+                    updateSliders();
+                } catch (std::runtime_error error) { ShowError(error); }
+            });
 
-            // resetButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
-            //     ResetFrequencyRange();
-            //     updateSliders();
-            // });
+            resetButton->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
+                try {
+                    ResetFrequencyRange();
+                    updateSliders();
+                } catch (std::runtime_error error) { ShowError(error); }
+            });
 
             frame->Show(true);
             
