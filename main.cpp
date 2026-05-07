@@ -157,12 +157,12 @@ public:
             sizer->Add(unlockButton);
             sizer->Add(resetButton);
 
-            unlockButton->Bind(wxEVT_BUTTON, [=]() {
+            unlockButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 ExtendFrequencyRange();
                 updateSliders();
             });
 
-            resetButton->Bind(wxEVT_BUTTON, [=]() {
+            resetButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 ResetFrequencyRange();
                 updateSliders();
             });
