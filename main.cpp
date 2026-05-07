@@ -125,8 +125,7 @@ public:
                     SetFrequencyRange({ GetValue(minSlider), GetValue(maxSlider) });
                 } catch (std::runtime_error error) {
                     ShowError(error);
-
-                   updateSliders();
+                    updateSliders();
                 }
             };
 
@@ -143,7 +142,6 @@ public:
             unlockButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 try {
                     ExtendFrequencyRange();
-
                     updateSliders();
                 } catch (std::runtime_error error) { ShowError(error); }
             });
@@ -151,11 +149,7 @@ public:
             resetButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
                 try {
                     ResetFrequencyRange();
-                    
-                    auto range = GetFrequencyRange();
-                    
-                    minSlider->SetValue(range.min);
-                    maxSlider->SetValue(range.max);
+                    updateSliders();
                 } catch (std::runtime_error error) { ShowError(error); }
             });
 
