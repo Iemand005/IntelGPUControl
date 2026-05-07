@@ -152,10 +152,20 @@ public:
 
 
             wxButton *unlockButton = new wxButton(panel, wxID_ANY, "Unlock");
-            wxButton *resetButton = new wxButton(panel, wxID_ANY, "Unlock");
+            wxButton *resetButton = new wxButton(panel, wxID_ANY, "Reset");
 
             sizer->Add(unlockButton);
             sizer->Add(resetButton);
+
+            unlockButton->Bind(wxEVT_BUTTON, [=]() {
+                ExtendFrequencyRange();
+                updateSliders();
+            });
+
+            resetButton->Bind(wxEVT_BUTTON, [=]() {
+                ResetFrequencyRange();
+                updateSliders();
+            });
 
             frame->Show(true);
             
