@@ -120,14 +120,8 @@ public:
                 maxSlider->SetValue(range.max);
             };
 
-            auto apply = [=](wxCommandEvent&) { 
+            auto apply = [=](double min, double max) { 
                 try {
-                    double min = GetValue(minSlider), max = GetValue(maxSlider);
-                    if (min > max) {
-                        min = max;
-                        updateSliders();
-                    }
-                    // if (max >) min = max;
                     SetFrequencyRange({ min, max });
                 } catch (std::runtime_error error) {
                     ShowError(error);
@@ -136,13 +130,14 @@ public:
             };
 
             minSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
-                if (min > max) {
-                    min = max;
-                    updateSliders();
-                }
+                double min = GetValue(minSlider), max = GetValue(maxSlider);
+                if (min > max) min = max;
+                apply(min, max);
             });
             maxSlider->Bind(wxEVT_SLIDER, [=](wxCommandEvent&) {
-                
+                double min = GetValue(minSlider), max = GetValue(maxSlider);
+                if (max < min) max = min;
+                apply(min, max);
             });
 
 
